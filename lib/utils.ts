@@ -24,3 +24,14 @@ export const handleError = (error: unknown) => {
     error: JSON.stringify(error),
   };
 };
+
+// export const deepCopyObjects = <T extends object>(objects: T[]) => {
+//   const copiedObjects = objects.map((obj) => JSON.parse(JSON.stringify(obj)));
+//   return Object.assign({}, ...copiedObjects);
+// };
+
+export const deepCopyObjects = <T extends object | null>(objects: (T | null)[]) => {
+  const filteredObjects = objects.filter((obj) => obj !== null) as T[];
+  const copiedObjects = filteredObjects.map((obj) => JSON.parse(JSON.stringify(obj)));
+  return Object.assign({}, ...copiedObjects);
+};
