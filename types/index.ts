@@ -1,10 +1,10 @@
+import { User } from '@prisma/client';
+
 import { aspectRatioOptions } from '@/lib/constants';
 
 declare global {
   interface CustomJwtSessionClaims {
-    user?: {
-      userId: string;
-    };
+    user?: User;
   }
 }
 

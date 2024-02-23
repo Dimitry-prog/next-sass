@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import MediaUploader from '@/components/shared/media-uploader';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -212,6 +213,28 @@ const TransformationForm = ({
             )}
           </div>
         )}
+
+        <div className="media-uploader-field">
+          <FormField
+            control={form.control}
+            name="publicId"
+            render={({ field }) => (
+              <FormItem className="flex size-full flex-col">
+                <FormLabel>Image</FormLabel>
+                <FormControl>
+                  <MediaUploader
+                    onValueChange={field.onChange}
+                    setImage={setImage}
+                    publicId={field.value}
+                    image={image}
+                    type={type}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="flex flex-col gap-4">
           <Button
