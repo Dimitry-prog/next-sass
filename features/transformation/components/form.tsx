@@ -22,14 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import TransformedImage from '@/features/transformation/components/transformed-image';
 import {
   TransformationConfigType,
   TransformationFormDataType,
   TransformationType,
 } from '@/features/transformation/types';
 import { transformationSchema } from '@/features/transformation/validation';
+import { updateCredits } from '@/features/user/actions';
 import {
   aspectRatioOptions,
+  creditFee,
   transformationFormDataDefaultValues,
   transformationTypes,
 } from '@/lib/constants';
@@ -115,7 +118,9 @@ const TransformationForm = ({
     setTransformationConfig(deepCopyObjects([newTransformation, transformationConfig]));
     setNewTransformation(null);
 
-    startTransition(async () => {});
+    startTransition(async () => {
+      await updateCredits(userId, creditFee);
+    });
   };
 
   const onSubmit: SubmitHandler<TransformationFormDataType> = (values) => {
@@ -233,6 +238,15 @@ const TransformationForm = ({
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          <TransformedImage
+            image={image}
+            type={type}
+            title={form.getValues().title}
+            isTransforming={isTransforming}
+            setIsTransforming={setIsTransforming}
+            transformationConfig={transformationConfig}
           />
         </div>
 

@@ -62,3 +62,21 @@ export const getUserById = async (clerkId: string) => {
     handleError(e);
   }
 };
+
+export const updateCredits = async (userId: string, creditFee: number) => {
+  try {
+    const user = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        creditBalance: creditFee,
+      },
+    });
+
+    return user;
+  } catch (e) {
+    console.log(e);
+    handleError(e);
+  }
+};
