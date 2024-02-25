@@ -4,16 +4,16 @@ import { CldImage } from 'next-cloudinary';
 import { Dispatch, SetStateAction } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { TransformationConfigType } from '@/features/transformation/types';
+import { ImageType, TransformationConfigType } from '@/features/transformation/types';
 import { dataUrl, getImageSize } from '@/lib/utils';
 
 type TransformedImageProps = {
-  image: any;
+  image: Partial<ImageType> | undefined;
   type: string;
   title: string;
   isTransforming: boolean;
   setIsTransforming: Dispatch<SetStateAction<boolean>>;
-  transformationConfig: TransformationConfigType | null;
+  transformationConfig: TransformationConfigType | undefined;
   hasDownload?: boolean;
 };
 

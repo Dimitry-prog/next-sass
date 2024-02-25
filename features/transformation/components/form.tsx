@@ -1,6 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { getCldImageUrl } from 'next-cloudinary';
 import { useState, useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -22,8 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { createImage, updateImage } from '@/features/transformation/actions';
 import TransformedImage from '@/features/transformation/components/transformed-image';
 import {
+  ImageType,
   TransformationConfigType,
   TransformationFormDataType,
   TransformationType,
@@ -44,8 +48,8 @@ type TransformationFormProps = {
   userId: string;
   type: TransformationType;
   creditBalance: number;
-  data?: Record<string, string | number>;
-  config?: TransformationConfigType | null;
+  imageData?: Partial<ImageType>;
+  config?: TransformationConfigType;
 };
 
 const TransformationForm = ({
@@ -53,10 +57,11 @@ const TransformationForm = ({
   userId,
   type,
   creditBalance,
-  data,
-  config = null,
+  imageData,
+  config,
 }: TransformationFormProps) => {
-  const [image, setImage] = useState(data);
+  const router = useRouter();
+  const [image, setImage] = useState(imageData);
   const [transformationConfig, setTransformationConfig] = useState(config);
   const [newTransformation, setNewTransformation] = useState<TransformationConfigType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,19 +70,19 @@ const TransformationForm = ({
 
   const transformationType = transformationTypes[type];
   const initValues =
-    data && action === 'update'
+    imageData && action === 'update'
       ? {
-          title: data?.title,
-          publicId: data?.publicId,
-          aspectRatio: data?.aspectRatio,
-          color: data?.color,
-          prompt: data?.prompt,
+          title: imageData?.title,
+          publicId: imageData?.publicId,
+          aspectRatio: imageData?.aspectRatio,
+          color: imageData?.color,
+          prompt: imageData?.prompt,
         }
       : transformationFormDataDefaultValues;
 
   const form = useForm<TransformationFormDataType>({
     resolver: zodResolver(transformationSchema),
-    // defaultValues: initValues,
+    defaultValues: initValues,
   });
 
   const handleSelectField = (value: string, onChange: (value: string) => void) => {
@@ -123,8 +128,58 @@ const TransformationForm = ({
     });
   };
 
-  const onSubmit: SubmitHandler<TransformationFormDataType> = (values) => {
+  const onSubmit: SubmitHandler<TransformationFormDataType> = async (values) => {
     console.log(values);
+    setIsSubmitting(true);
+
+    if (imageData || image) {
+      const transformationUrl = getCldImageUrl({
+        width: image?.width,
+        height: image?.height,
+        src: image?.publicId as string,
+        ...transformationConfig,
+      });
+
+      const createImageData = {
+        title: values.title,
+        publicId: values.publicId,
+        aspectRatio: values.aspectRatio,
+        prompt: values.prompt,
+        color: values.color,
+        transformation: type,
+        width: image?.width as number,
+        height: image?.height as number,
+        config: transformationConfig,
+        secureUrl: image?.secureUrl as string,
+        transformationUrl,
+      };
+      console.log('createImageData', createImageData);
+      if (action === 'create') {
+        const newImage = await createImage(createImageData, userId, '/');
+
+        if (newImage) {
+          setImage(imageData);
+          router.push(`/transformations/${newImage.id}`);
+        }
+      }
+
+      if (action === 'update') {
+        const updatedImage = await updateImage(
+          {
+            ...createImageData,
+            id: imageData?.id as string,
+          },
+          userId,
+          `/transformations/${imageData?.id}`
+        );
+
+        if (updatedImage) {
+          router.push(`/transformations/${updatedImage.id}`);
+        }
+      }
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -225,7 +280,6 @@ const TransformationForm = ({
             name="publicId"
             render={({ field }) => (
               <FormItem className="flex size-full flex-col">
-                <FormLabel>Image</FormLabel>
                 <FormControl>
                   <MediaUploader
                     onValueChange={field.onChange}

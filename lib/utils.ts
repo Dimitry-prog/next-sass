@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { ImageType } from '@/features/transformation/types';
 import { aspectRatioOptions } from '@/lib/constants';
 import { AspectRatioKeyType } from '@/types';
 
@@ -28,13 +29,17 @@ export const handleError = (error: unknown) => {
   };
 };
 
-export const deepCopyObjects = <T extends object | null>(objects: (T | null)[]) => {
-  const filteredObjects = objects.filter((obj) => obj !== null) as T[];
+export const deepCopyObjects = <T extends object | undefined>(objects: (T | null)[]) => {
+  const filteredObjects = objects.filter((obj) => obj !== undefined) as T[];
   const copiedObjects = filteredObjects.map((obj) => JSON.parse(JSON.stringify(obj)));
   return Object.assign({}, ...copiedObjects);
 };
 
-export const getImageSize = (type: string, image: any, dimension: 'width' | 'height'): number => {
+export const getImageSize = (
+  type: string,
+  image: Partial<ImageType> | undefined,
+  dimension: 'width' | 'height'
+): number => {
   if (type === 'fill') {
     return aspectRatioOptions[image?.aspectRatio as AspectRatioKeyType]?.[dimension] || 1000;
   }

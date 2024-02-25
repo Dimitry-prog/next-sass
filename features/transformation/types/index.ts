@@ -21,3 +21,18 @@ export type TransformationConfigType = {
   };
   removeBackground?: boolean;
 };
+
+export type ImageType = {
+  id: string;
+  title: string;
+  publicId: string;
+  transformation: string;
+  width: number;
+  height: number;
+  secureUrl: string;
+  transformationUrl: string;
+  aspectRatio: string | undefined;
+  prompt: string | undefined;
+  color: string | undefined;
+  config: TransformationConfigType | undefined;
+};

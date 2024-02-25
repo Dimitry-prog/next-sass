@@ -6,13 +6,14 @@ import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { Dispatch, SetStateAction } from 'react';
 
 import { useToast } from '@/components/ui/use-toast';
+import { ImageType } from '@/features/transformation/types';
 import { dataUrl, getImageSize } from '@/lib/utils';
 
 type MediaUploaderProps = {
   onValueChange: (values: string) => void;
-  setImage: Dispatch<SetStateAction<Record<string, string | number> | undefined>>;
+  setImage: Dispatch<SetStateAction<Partial<ImageType> | undefined>>;
   publicId: string;
-  image: unknown;
+  image: Partial<ImageType> | undefined;
   type: string;
 };
 
@@ -22,13 +23,13 @@ const MediaUploader = ({ onValueChange, setImage, publicId, image, type }: Media
   const handleUploadSuccess = (result: any) => {
     setImage((prev) => ({
       ...prev,
-      publicId: result?.public_id,
-      width: result?.width,
-      height: result?.height,
-      secureUrl: result?.secure_url,
+      publicId: result?.info?.public_id,
+      width: result?.info?.width,
+      height: result?.info?.height,
+      secureUrl: result?.info?.secure_url,
     }));
 
-    onValueChange(result?.public_id);
+    onValueChange(result?.info?.public_id);
 
     toast({
       title: 'Image uploaded successfully',
