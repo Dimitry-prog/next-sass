@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { getCldImageUrl } from 'next-cloudinary';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import CreditsModal from '@/components/shared/credits-modal';
@@ -181,6 +181,12 @@ const TransformationForm = ({
 
     setIsSubmitting(false);
   };
+
+  useEffect(() => {
+    if (image && (type === 'restore' || type === 'removeBackground')) {
+      setNewTransformation(transformationType.config);
+    }
+  }, [image, type, transformationType.config]);
 
   return (
     <Form {...form}>
