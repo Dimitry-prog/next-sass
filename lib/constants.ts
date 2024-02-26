@@ -115,4 +115,4 @@ export const aspectRatioOptions = {
   },
 };
 
-export const creditFee = -1;
+export const creditFee = 1;

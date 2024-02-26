@@ -13,7 +13,7 @@ export const createImage = async (image: Omit<ImageType, 'id'>, userId: string, 
         id: userId,
       },
     });
-    console.log({ author });
+
     if (!author) {
       throw new Error('User not found');
     }
@@ -24,7 +24,7 @@ export const createImage = async (image: Omit<ImageType, 'id'>, userId: string, 
         userId: author.id,
       },
     });
-    console.log({ createImage });
+
     revalidatePath(path);
     return createImage;
   } catch (e) {

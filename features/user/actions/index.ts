@@ -48,11 +48,11 @@ export const deleteUser = async (clerkId: string) => {
   }
 };
 
-export const getUserById = async (clerkId: string) => {
+export const getUserById = async (userId: string) => {
   try {
     const user = await db.user.findFirst({
       where: {
-        clerkId,
+        id: userId,
       },
     });
 
@@ -70,7 +70,9 @@ export const updateCredits = async (userId: string, creditFee: number) => {
         id: userId,
       },
       data: {
-        creditBalance: creditFee,
+        creditBalance: {
+          decrement: creditFee,
+        },
       },
     });
 

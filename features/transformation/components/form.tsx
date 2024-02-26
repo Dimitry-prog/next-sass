@@ -6,6 +6,7 @@ import { getCldImageUrl } from 'next-cloudinary';
 import { useState, useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import CreditsModal from '@/components/shared/credits-modal';
 import MediaUploader from '@/components/shared/media-uploader';
 import { Button } from '@/components/ui/button';
 import {
@@ -129,7 +130,6 @@ const TransformationForm = ({
   };
 
   const onSubmit: SubmitHandler<TransformationFormDataType> = async (values) => {
-    console.log(values);
     setIsSubmitting(true);
 
     if (imageData || image) {
@@ -153,7 +153,7 @@ const TransformationForm = ({
         secureUrl: image?.secureUrl as string,
         transformationUrl,
       };
-      console.log('createImageData', createImageData);
+
       if (action === 'create') {
         const newImage = await createImage(createImageData, userId, '/');
 
@@ -185,6 +185,8 @@ const TransformationForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {creditBalance < Math.abs(creditFee) && <CreditsModal />}
+
         <FormField
           control={form.control}
           name="title"
