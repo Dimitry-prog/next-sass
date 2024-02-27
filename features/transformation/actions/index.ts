@@ -1,5 +1,6 @@
 'use server';
 
+import { v2 as cloudinary } from 'cloudinary';
 import { revalidatePath } from 'next/cache';
 
 import { ImageType } from '@/features/transformation/types';
@@ -89,6 +90,66 @@ export const getImageById = async (imageId: string) => {
     });
 
     return image;
+  } catch (e) {
+    console.log(e);
+    handleError(e);
+  }
+};
+
+export const getAllImages = async ({
+  limit = 6,
+  page = 1,
+  searchQuery = '',
+}: {
+  limit?: number;
+  page?: number;
+  searchQuery?: string;
+}) => {
+  try {
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true,
+    });
+
+    let expression = 'folder=create-images';
+
+    if (searchQuery) {
+      expression += ` AND ${searchQuery}`;
+    }
+
+    const { resources } = await cloudinary.search.expression(expression).execute();
+    const resourcedIds: string[] = resources.map((resource: any) => resource.public_id);
+
+    const totalImages = await db.image.count({
+      where: {
+        publicId: {
+          in: resourcedIds,
+        },
+      },
+    });
+
+    const dbImages = await db.image.count();
+
+    const images = await db.image.findMany({
+      where: {
+        publicId: {
+          in: resourcedIds,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: limit * (page - 1),
+    });
+
+    return {
+      data: images,
+      totalPages: Math.ceil(totalImages / limit),
+      dbImages,
+    };
   } catch (e) {
     console.log(e);
     handleError(e);
