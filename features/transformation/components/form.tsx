@@ -91,7 +91,7 @@ const TransformationForm = ({
 
     setImage((prev) => ({
       ...prev,
-      aspectRation: imageSize.aspectRatio,
+      aspectRatio: imageSize.aspectRatio,
       width: imageSize.width,
       height: imageSize.height,
     }));
@@ -215,7 +215,10 @@ const TransformationForm = ({
               <FormItem className="w-full">
                 <FormLabel>Aspect Ratio</FormLabel>
                 <FormControl>
-                  <Select onValueChange={(value) => handleSelectField(value, field.onChange)}>
+                  <Select
+                    onValueChange={(value) => handleSelectField(value, field.onChange)}
+                    value={field.value}
+                  >
                     <SelectTrigger className="select-field">
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>

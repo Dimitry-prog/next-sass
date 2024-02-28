@@ -63,7 +63,7 @@ export const updateImage = async (image: ImageType, userId: string, path: string
   }
 };
 
-export const deleteImage = async (imageId: string) => {
+export const deleteImage = async (imageId: string, path: string) => {
   try {
     const deleteImage = await db.image.delete({
       where: {
@@ -71,6 +71,7 @@ export const deleteImage = async (imageId: string) => {
       },
     });
 
+    revalidatePath(path);
     return deleteImage;
   } catch (e) {
     console.log(e);
@@ -84,7 +85,7 @@ export const getImageById = async (imageId: string) => {
       where: {
         id: imageId,
       },
-      select: {
+      include: {
         user: true,
       },
     });

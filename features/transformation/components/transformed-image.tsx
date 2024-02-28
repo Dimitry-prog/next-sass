@@ -1,18 +1,20 @@
+'use client';
+
 import { PlaceholderValue } from 'next/dist/shared/lib/get-img-props';
 import Image from 'next/image';
-import { CldImage } from 'next-cloudinary';
+import { CldImage, getCldImageUrl } from 'next-cloudinary';
 import { Dispatch, SetStateAction } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { ImageType, TransformationConfigType } from '@/features/transformation/types';
-import { dataUrl, getImageSize } from '@/lib/utils';
+import { dataUrl, download, getImageSize } from '@/lib/utils';
 
 type TransformedImageProps = {
   image: Partial<ImageType> | undefined;
   type: string;
   title: string;
   isTransforming: boolean;
-  setIsTransforming: Dispatch<SetStateAction<boolean>>;
+  setIsTransforming?: Dispatch<SetStateAction<boolean>>;
   transformationConfig: TransformationConfigType | undefined;
   hasDownload?: boolean;
 };
@@ -26,13 +28,25 @@ const TransformedImage = ({
   title,
   transformationConfig,
 }: TransformedImageProps) => {
+  const handleDownloadImage = () => {
+    download(
+      getCldImageUrl({
+        width: image?.width,
+        height: image?.height,
+        src: image?.publicId as string,
+        ...transformationConfig,
+      }),
+      title
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex-between">
         <h3 className="h3-bold text-dark-600">Transformed</h3>
 
         {hasDownload && (
-          <Button className="download-btn" variant="outline">
+          <Button onClick={handleDownloadImage} className="download-btn" variant="outline">
             <Image
               src="/icons/download.svg"
               alt="download"
@@ -66,6 +80,7 @@ const TransformedImage = ({
           {isTransforming && (
             <div className="transforming-loader">
               <Image src="/icons/spinner.svg" alt="loader" width={50} height={50} />
+              <p className="text-white/80">Please wait...</p>
             </div>
           )}
         </div>
