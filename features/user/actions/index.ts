@@ -71,7 +71,7 @@ export const updateCredits = async (userId: string, creditFee: number) => {
       },
       data: {
         creditBalance: {
-          decrement: creditFee,
+          increment: creditFee,
         },
       },
     });

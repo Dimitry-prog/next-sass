@@ -98,7 +98,7 @@ export const getImageById = async (imageId: string) => {
 };
 
 export const getAllImages = async ({
-  limit = 6,
+  limit = 2,
   page = 1,
   searchQuery = '',
 }: {
@@ -150,6 +150,43 @@ export const getAllImages = async ({
       data: images,
       totalPages: Math.ceil(totalImages / limit),
       dbImages,
+    };
+  } catch (e) {
+    console.log(e);
+    handleError(e);
+  }
+};
+
+export const getUserImages = async ({
+  page = 1,
+  limit = 2,
+  userId,
+}: {
+  page?: number;
+  limit?: number;
+  userId: string;
+}) => {
+  try {
+    const totalImages = await db.image.count({
+      where: {
+        userId,
+      },
+    });
+
+    const images = await db.image.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: limit * (page - 1),
+    });
+
+    return {
+      data: images,
+      totalPages: Math.ceil(totalImages / limit),
     };
   } catch (e) {
     console.log(e);
