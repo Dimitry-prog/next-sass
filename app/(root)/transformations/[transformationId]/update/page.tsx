@@ -23,7 +23,7 @@ const UpdateTransformationsPage = async ({
 
   const user = await getUserById(sessionClaims?.user?.id as string);
   const image = await getImageById(transformationId);
-  console.log({ image });
+
   const transformation = transformationTypes[image?.transformation as TransformationType];
 
   return (
